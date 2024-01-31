@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'mainpage.dart';
 import 'cammer/camera_state.dart';
 import 'package:provider/provider.dart';
+import 'record/audio_record_state.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => CameraState(),
+    MultiProvider( // 여러 객체 상태 관리
+      providers: [
+        ChangeNotifierProvider(create: (context) => CameraState()),
+        ChangeNotifierProvider(create: (context) => AudioRecordState()),
+      ],
       child: MyApp(),
     ),
   );
