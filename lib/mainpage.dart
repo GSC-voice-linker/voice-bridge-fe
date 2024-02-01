@@ -194,8 +194,34 @@ class _MainpageState extends State<Mainpage> {
                     borderRadius: BorderRadius.circular(12),
                     color: Colors.blue,
                   ),
-                  child: Center(
-                    child: Text(recordState.serverResponseText), // 서버로부터 받은 응답 출력
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        recordState.serverResponseText, // 서버로부터 받은 텍스트 출력
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        recordState.upLoadText, // 서버로부터 받은 텍스트 출력
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        recordState.upLoadText2, // 서버로부터 받은 텍스트 출력
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
                   ),
                 ),
               ),
@@ -230,6 +256,13 @@ class _MainpageState extends State<Mainpage> {
                     }
                   },
                 ),
+                ElevatedButton(
+                  onPressed: () {
+                    recordState.testServerConnection('http://35.197.3.194:8000/stt/');
+                  },
+                  child: Text('서버 테스트'),
+                )
+
 
               ],
             ),

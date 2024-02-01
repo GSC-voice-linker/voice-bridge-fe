@@ -6,6 +6,9 @@ import 'package:path/path.dart' as path;
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
+import  'package:dio/dio.dart';
+import 'package:path/path.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 
 class AudioRecordState extends ChangeNotifier {
@@ -17,13 +20,18 @@ class AudioRecordState extends ChangeNotifier {
   String get audioPath => _audioPath;
   String serverResponseText = ''; //  서버로부터 받은 텍스트 저장하는 변수
 
-  // 녹음 시작
+  String get severResponseText => serverResponseText; // 서버로부터 받은 텍스트 반환
+  String upLoadText = ''; // 업로드 상태 저장 변수
+  String upLoadText2 = ''; // 파일 존재여부
+
+
   Future<void> startRecording() async { // 녹음을 시작하는 함수
     if (await _audioRecorder.hasPermission()) {
       final config = RecordConfig( // 녹음 설정
         encoder: AudioEncoder.aacLc,
         bitRate: 128000,
         sampleRate: 44100,
+        numChannels: 1, // 채널 수를 1로 설정하여 모노 녹음
       );
       final directory = await getTemporaryDirectory(); // 임시 디렉토리 경로 가져오기
       _audioPath = '${directory.path}/audio.aac';// 파일 경로 생성 및 반환
@@ -31,58 +39,70 @@ class AudioRecordState extends ChangeNotifier {
       await _audioRecorder.start(config, path: _audioPath); //파일 경로로 녹음 시작
       _isRecording = true;// 녹음 중 상태로 변경
       notifyListeners(); // 상태 변경 알림
+      print("START RECODING+++++++++++++++++++++++++++++++++++++++++++++++++");
     }
   }
 
   // 녹음 중지 및 파일 업로드
   Future<void> stopRecording() async { // 녹음 중지 함수
+    print("STOP RECODING+++++++++++++++++++++++++++++++++++++++++++++++++");
     await _audioRecorder.stop();// 녹음 중지
     _isRecording = false; // 녹음 중이 아님으로 변경
     notifyListeners();
     await _uploadRecording();
+    print("경로확인 $_audioPath+++++++++++++++++++++++++++++++++");
   }
+
 
   // 서버에 녹음 파일 업로드
   Future<void> _uploadRecording() async {
-    final url = Uri.parse('http://35.197.3.194:8000/stt/'); // 서버 URL 지정
-    final file = File(_audioPath); // 녹음 파일 경로 지정
+    print("UPLOAD RECORDING+++++++++++++++++++++++++++++++++++++++++++++++++");
+    // 서버 URL 수정
+    final String url = 'http://35.197.3.194:8000/stt/';
+    final File file = File(_audioPath); // _audioPath는 녹음 파일의 경로
 
     if (!file.existsSync()) {
       print("파일이 존재하지 않습니다.");
+      upLoadText2 = "파일이 존재하지 않음!";
       return;
     }
 
     try {
-      final request = http.MultipartRequest('POST', url)
-        ..files.add(
-          http.MultipartFile(
-            'file',
-            file.readAsBytes().asStream(),
-            file.lengthSync(),
-            filename: path.basename(file.path),
-          ),
-        );
-
-      final response = await http.Response.fromStream(await request.send());
+      Dio dio = Dio();
+      FormData formData = FormData.fromMap({
+        "audio": await MultipartFile.fromFile(file.path, filename: path.basename(file.path)), // audio키에 파일을 할당
+      });
+      print("테스트1+++++++++++++++++++++++++++++++++++++++++++++++++");
+      var response = await dio.post(url, data: formData);
+      print("테스트2+++++++++++++++++++++++++++++++++++++++++++++++++");
       if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        final textResult = responseData['text']; // 서버로부터 받은 'text' 값
-        serverResponseText = textResult; // serverResponseText 업데이트
-        notifyListeners(); // 상태 변경 알림
-        print("파일 업로드 성공!"); // 업로드 성공시 메시지 출력
+        print("파일 업로드 성공!+++++++++++++++++++++++++++++++++++++++++++++++++");
+        // 서버로부터 받은 응답 데이터 처리
+        final responseData = response.data;
+        if (responseData.containsKey('text')) {
+          serverResponseText = responseData['text']; // 'text' 값 추출
+          print("서버 응답 텍스트: $serverResponseText");
+          upLoadText = "파일 업로드 성공!";
+        } else {
+          print("응답에 'text' 키가 없습니다.");
+          upLoadText = "응답 데이터 오류!";
+        }
       } else {
-        // 업로드 실패 처리
-        print("파일 업로드 실패: ${response.statusCode}"); // 업로드 실패시 메시지 출력
+        print("업로드 실패: 상태 코드 ${response.statusCode}");
+        upLoadText = "업로드 실패! 상태 코드: ${response.statusCode}";
       }
     } catch (e) {
-      print("업로드 중 오류 발생: $e"); // 오류 발생시 메시지 출력
-      // 오류 처리
+      print("업로드 중 오류 발생: $e");
+      upLoadText = "업로드 오류! 상세 정보 없음";
     }
-  }
 
+    // 상태 업데이트를 위한 notifyListeners() 호출 (ChangeNotifier를 상속받은 클래스일 경우)
+    notifyListeners();
+  }
   @override
   void dispose() { // 상태 관리 객체 해제
     _audioRecorder.dispose(); // 녹음 객체 해제
     super.dispose(); // 상태 관리 객체 해제
+
   }
 }
