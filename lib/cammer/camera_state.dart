@@ -21,10 +21,11 @@ class CameraState extends ChangeNotifier {
   void _initializeCamera() async {// 카메라 초기화 함수
     final cameras = await availableCameras();// 사용 가능한 카메라 목록을 가져옴
     if (cameras.isNotEmpty) {// 사용 가능한 카메라가 있으면
-      _cameraController = CameraController(cameras.first, ResolutionPreset.max);// 카메라 제어 객체 생성
+      _cameraController = CameraController(cameras[1], ResolutionPreset.high); //전면 카메라 가져옴
       await _cameraController!.initialize();// 카메라 초기화
       notifyListeners();
     }
+
   }
 
   void startRecording() async {// 녹화 시작 함수
@@ -50,7 +51,7 @@ class CameraState extends ChangeNotifier {
   }
 }
 
-Future<void> _uploadFileToServer(String filePath) async {
+Future<void> _uploadFileToServer(String filePath) async { // 파일을 서버로 업로드하는 함수
   final url = Uri.parse("my-server-url");
   final request = http.MultipartRequest("POST", url);
 

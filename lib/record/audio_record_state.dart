@@ -1,3 +1,4 @@
+//audio_record_state.dart 파일
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -7,13 +8,12 @@ import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import  'package:dio/dio.dart';
-import 'package:path/path.dart';
-import 'package:audioplayers/audioplayers.dart';
-
+import 'package:voice_bridge_main/chat/chat_state.dart';
+import 'package:voice_bridge_main/chat/chat_service.dart';
 
 class AudioRecordState extends ChangeNotifier {
   final AudioRecorder _audioRecorder = AudioRecorder(); // 녹음 객체(클래스 내에서만 쓰이고,private)
-  String _audioPath = "";
+  String _audioPath = ""; // 녹음된 파일의 경로를 저장하는 변수
   bool _isRecording = false; // 녹음 중인지 여부를 저장하는 변수
 
   bool get isRecording => _isRecording;
@@ -72,9 +72,7 @@ class AudioRecordState extends ChangeNotifier {
       FormData formData = FormData.fromMap({
         "audio": await MultipartFile.fromFile(file.path, filename: path.basename(file.path)), // audio키에 파일을 할당
       });
-      print("테스트1+++++++++++++++++++++++++++++++++++++++++++++++++");
       var response = await dio.post(url, data: formData);
-      print("테스트2+++++++++++++++++++++++++++++++++++++++++++++++++");
       if (response.statusCode == 200) {
         print("파일 업로드 성공!+++++++++++++++++++++++++++++++++++++++++++++++++");
         // 서버로부터 받은 응답 데이터 처리

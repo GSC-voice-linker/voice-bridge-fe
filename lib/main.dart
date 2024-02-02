@@ -1,8 +1,10 @@
+//main.dart 파일
 import 'package:flutter/material.dart';
 import 'mainpage.dart';
 import 'cammer/camera_state.dart';
 import 'package:provider/provider.dart';
 import 'record/audio_record_state.dart';
+import 'chat/chat_state.dart';
 
 void main() {
   runApp(
@@ -10,6 +12,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => CameraState()),
         ChangeNotifierProvider(create: (context) => AudioRecordState()),
+        ChangeNotifierProvider(create: (context) => MessageProvider()),
       ],
       child: MyApp(),
     ),
