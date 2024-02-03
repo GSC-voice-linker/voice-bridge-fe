@@ -47,7 +47,12 @@ class _MainpageState extends State<Mainpage> {
 
   Widget build(BuildContext context) { //main페이지 빌드
     var cameraState = Provider.of<CameraState>(context); // 카메라 상태 가져오기
-    var recordState = Provider.of<AudioRecordState>(context); // 녹음 상태 가져오기
+    // var recordState = Provider.of<AudioRecordState>(context); // 녹음 상태 가져오기
+    var recordState = Provider.of<AudioRecordState>(context, listen: false);
+
+    recordState.onTextReceived = (text) {
+      Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
+    };
 
 
     return Scaffold(
