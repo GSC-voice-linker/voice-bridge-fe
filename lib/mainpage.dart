@@ -10,27 +10,38 @@ import 'package:flutter_svg/flutter_svg.dart'; //svg 이미지 라이브러리
 
 
 class Mainpage extends StatefulWidget {
-  const Mainpage({super.key});//
+  const Mainpage({super.key});// //생성자
 
   @override
   _MainpageState createState() => _MainpageState();
 }
 
 class _MainpageState extends State<Mainpage> {
-  // late final AudioRecorder audioRecord; //Record 클래스 인스턴스
-  // late AudioPlayer audioPlayer;
-  // bool isAudioRecording = false; // 녹음 중인지 여부를 저장하는 변수]
-  // String audioPath = ""; // 녹음된 파일의 경로를 저장하는 변수 .state파일에서 관리함으로 제거
   late CameraControlWidget cameraControl; //카메라 녹화 클래스 인스턴스
   List<Message> messages = []; // 메세지 리스트
-
+  bool _isCallbackSet = false;
 
   @override
   void initState() {//초기화
     super.initState();//부모클래스의 initState 호출
     _loadMessagesFromServer();
+    _initializeCallbacks();
   }
 
+  void _initializeCallbacks() {
+    // 여기에서 콜백 함수를 설정합니다.
+    // 예를 들어, CameraState와 AudioRecordState에서 사용할 콜백 함수를 설정할 수 있습니다.
+    final cameraState = Provider.of<CameraRecordState>(context, listen: false);
+    final recordState = Provider.of<AudioRecordState>(context, listen: false);
+
+    cameraState.onTextCameraReceived = (text) {
+      Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
+    };
+
+    recordState.onTextAudioReceived = (text) {
+      Provider.of<MessageProvider>(context, listen: false).addMessage(text, false);
+    };
+  }
 
   Future<void> _loadMessagesFromServer() async {
     // Provider를 사용하여 MessageProvider에 접근.
@@ -48,18 +59,26 @@ class _MainpageState extends State<Mainpage> {
   @override
 
   Widget build(BuildContext context) { //main페이지 빌드
-    var cameraState = Provider.of<CameraRecordState>(context, listen: true); // 카메라 상태 가져오기
-    // var recordState = Provider.of<AudioRecordState>(context); // 녹음 상태 가져오기
-    var recordState = Provider.of<AudioRecordState>(context, listen: true);
-    // var chatState = Provider.of<MessageProvider>(context, listen: false);
+    // var cameraState = Provider.of<CameraRecordState>(context, listen: true); // 카메라 상태 가져오기
+    // // var recordState = Provider.of<AudioRecordState>(context); // 녹음 상태 가져오기
+    // var recordState = Provider.of<AudioRecordState>(context, listen: true);
+    // // var chatState = Provider.of<MessageProvider>(context, listen: false);
+    // if(!_isCallbackSet) {
+    //   recordState.onTextAudioReceived = (text) {
+    //     Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
+    //   }; // 녹음 중지 후 콜백 함수로 메시지 추가
+    //   cameraState.onTextCameraReceived = (text) {
+    //     Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
+    //   }; // 카메라 녹화 중지 후 콜백 함수로 메시지 추가
+    //   _isCallbackSet = true;
+    // }
 
-    recordState.onTextAudioReceived = (text) {
-      Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
-    }; // 녹음 중지 후 콜백 함수로 메시지 추가
-    cameraState.onTextCameraReceived = (text) {
-      Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
-    }; // 카메라 녹화 중지 후 콜백 함수로 메시지 추가
-
+    // recordState.onTextAudioReceived = (text) {
+    //   Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
+    // }; // 녹음 중지 후 콜백 함수로 메시지 추가
+    // cameraState.onTextCameraReceived = (text) {
+    //   Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
+    // }; // 카메라 녹화 중지 후 콜백 함수로 메시지 추가
 
     return Scaffold(
       appBar: AppBar(
@@ -115,43 +134,40 @@ class _MainpageState extends State<Mainpage> {
               ),
             ),
             const SizedBox(height: 33),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                IconButton( // 녹음 버튼
-                  icon: Icon(
-                    recordState.isRecording ? Icons.stop : Icons.mic, // 녹음 중이면 정지 아이콘, 아니면 마이크 아이콘
-                    size: 50,
-                  ),
-                  onPressed: () {
-                    if (recordState.isRecording) {
-                      recordState.stopRecording(); // 녹음 중지
-                      // 콜백을 통해 ChatState에 메시지 추가
-                      recordState.onTextAudioReceived = (text) {
-                        Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
-                      }; // 녹음 중지 후 콜백 함수로 메시지 추가
-                    } else {
-                      recordState.startRecording(); // 녹음 시작
-                    }
-                  },
-                ),
-                IconButton( // 카메라 녹화 버튼
-                  icon: Icon(
-                    cameraState.isVideoRecording ? Icons.videocam_off : Icons.videocam,
-                    size: 50,
-                  ),
-                  onPressed: () {
-                    if (cameraState.isVideoRecording) {
-                      cameraState.stopRecording(); //CanmeraState의 stopRecording() 메서드 호출
-                      cameraState.onTextCameraReceived = (text) {
-                        Provider.of<MessageProvider>(context, listen: true).addMessage(text, true);
-                      }; // 녹음 중지 후 콜백 함수로 메시지 추가
-                    } else {
-                      cameraState.startRecording(); //CanmeraState의 startRecording() 메서드 호출);
-                    }
-                  },
-                ),
-              ],
+            Consumer2<AudioRecordState, CameraRecordState>(
+              builder: (context, audioRecordState, cameraState, child) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        audioRecordState.isRecording ? Icons.stop : Icons.mic,
+                        size: 50,
+                      ),
+                      onPressed: () {
+                        if (audioRecordState.isRecording) {
+                          audioRecordState.stopRecording();
+                        } else {
+                          audioRecordState.startRecording();
+                        }
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        cameraState.isVideoRecording ? Icons.videocam_off : Icons.videocam,
+                        size: 50,
+                      ),
+                      onPressed: () {
+                        if (cameraState.isVideoRecording) {
+                          cameraState.stopRecording();
+                        } else {
+                          cameraState.startRecording();
+                        }
+                      },
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),

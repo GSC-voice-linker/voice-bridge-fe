@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
-
 //카메라 상태 관리
 //카메라 로직 구현
 
@@ -18,9 +17,6 @@ class CameraRecordState extends ChangeNotifier {
   String get severResponseCameraText => _serverResponseCameraText; // 서버로부터 받은 텍스트 반환
   String get cameraPath => _videoPath;
 
-  // CameraState() {
-  //   _initializeCamera(); // 카메라 초기화
-  // }
   Function(String)? onTextCameraReceived; // 콜백 함수
   CameraRecordState({this.onTextCameraReceived}) {
     _initializeCamera();
@@ -30,7 +26,7 @@ class CameraRecordState extends ChangeNotifier {
   bool get isCameraInitialized => _cameraController != null && _cameraController!.value.isInitialized; // 카메라 초기화 여부 반환
   bool get isVideoRecording => _isVideoRecording; // 녹화 중인지 여부 반환
 
-  void _initializeCamera() async {
+  void _initializeCamera() async { // 카메라 초기화 함수
     final cameras = await availableCameras();
     CameraDescription? frontCamera;
 
@@ -42,7 +38,7 @@ class CameraRecordState extends ChangeNotifier {
       }
     }
 
-    // 전면 카메라가 있으면
+    // 전면 카메라가 없으면
     if (frontCamera != null) {
       _cameraController = CameraController(frontCamera, ResolutionPreset.high);
       await _cameraController!.initialize();
@@ -63,14 +59,13 @@ class CameraRecordState extends ChangeNotifier {
 
   void stopRecording() async {
     final XFile? rawVideoFile = await _cameraController?.stopVideoRecording(); // 카메라 녹화 중지
-    _serverResponseCameraText = '카메라 스탑레코딩 테스트메시지===';// 서버텍스트로 옮겨지는지 테스트
-    print("==================카메라 응답 텍스트: $_serverResponseCameraText");
-    if(onTextCameraReceived != null) {
-      onTextCameraReceived!(_serverResponseCameraText);
+    _serverResponseCameraText = '카메라 테스트메시지';// 서버텍스트로 옮겨지는지 테스트
+    if(onTextCameraReceived != null) { // 콜백 함수가 null이 아니면
+      onTextCameraReceived!(_serverResponseCameraText); // serverResponseText를 콜백 함수로 전달
     } // serverResponseText를 콜백 함수로 전달
     if (rawVideoFile != null) {
       // 애플리케이션 문서 디렉토리에 비디오 파일 저장할 경로 지정
-      final Directory appDocDir = await getApplicationDocumentsDirectory();
+      final Directory appDocDir = await getApplicationDocumentsDirectory(); // 애플리케이션 문서 디렉토리 경로 가져오기
       final String videoPath = '${appDocDir.path}/my_video.mp4';
       // 녹화된 비디오 파일을 지정된 경로로 이동
       await rawVideoFile.saveTo(videoPath); // 비디오 파일 저장
@@ -90,25 +85,14 @@ class CameraRecordState extends ChangeNotifier {
     print("AUDIO UPLOAD RECORDING+++++++++++++++++++++++++++++++++++++++++++++++++");
     final String url = 'URL';
     final File file = File(_videoPath); // _audioPath는 녹음 파일의 경로
-
-    if (!file.existsSync()) {
+    if (!file.existsSync()) { // 파일이 존재하지 않으면
       print("파일이 존재하지 않습니다.");
       return;
     }
-    // request.files.add(
-    //   http.MultipartFile(
-    //     'file',
-    //     File(filePath).readAsBytes().asStream(),
-    //     File(filePath).lengthSync(),
-    //     filename: filePath
-    //         .split("/")
-    //         .last,
-    //   ),
-    // );
 
     try {
       Dio dio = Dio();
-      FormData formData = FormData.fromMap({
+      FormData formData = FormData.fromMap({ // FormData 객체 생성
           "video": await MultipartFile.fromFile(file.path, filename: path.basename(file.path)), // video키에 파일을 할당
       });
       var response = await dio.post(url, data: formData);
@@ -128,8 +112,8 @@ class CameraRecordState extends ChangeNotifier {
       print("업로드 에러발생=================================: $e");
       // 에러 처리 로직
     }
+    notifyListeners();
   }
-
   @override
   void dispose() {
     // 상태 관리 객체 해제
@@ -137,3 +121,4 @@ class CameraRecordState extends ChangeNotifier {
     super.dispose(); // 상태 관리 객체 해제
   }
 }
+

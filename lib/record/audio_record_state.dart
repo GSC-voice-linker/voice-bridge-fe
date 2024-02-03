@@ -48,7 +48,7 @@ class AudioRecordState extends ChangeNotifier {
   Future<void> stopRecording() async { // 녹음 중지 함수
     print("STOP RECODING+++++++++++++++++++++++++++++++++++++++++++++++++");
     await _audioRecorder.stop();// 녹음 중지
-    await _uploadRecording();
+    await _uploadRecordToServer();
     print("경로확인 $_audioPath+++++++++++++++++++++++++++++++++");
     _serverResponseAudioText = '반가워요방가방가';// 서버텍스트로 옮겨지는지 테스트
     print("==================서버 응답 텍스트: $_serverResponseAudioText");
@@ -60,7 +60,7 @@ class AudioRecordState extends ChangeNotifier {
   }
 
   // 서버에 녹음 파일 업로드
-  Future<void> _uploadRecording() async {
+  Future<void> _uploadRecordToServer() async {
     print("AUDIO UPLOAD RECORDING+++++++++++++++++++++++++++++++++++++++++++++++++");
     // 서버 URL 수정
     final String url = 'http://35.197.3.194:8000/stt/';
@@ -97,7 +97,6 @@ class AudioRecordState extends ChangeNotifier {
       print("업로드 중 오류 발생: $e");
       upLoadText = "업로드 오류! 상세 정보 없음";
     }
-
     // 상태 업데이트를 위한 notifyListeners() 호출
     notifyListeners();
   }
