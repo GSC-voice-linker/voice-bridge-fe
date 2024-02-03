@@ -17,17 +17,26 @@ class _CameraViewState extends State<CameraView> {
     if (!cameraState.isCameraInitialized) {
       return Center(child: CircularProgressIndicator());
     }
+// 원하는 출력 비율을 설정합니다. 예: 3:4
+    final desiredAspectRatio = 11 / 20;
+    // 실제 카메라 비율을 가져옵니다.
+    final cameraAspectRatio = cameraState.cameraController!.value.aspectRatio;
+    // 카메라 프리뷰의 실제 크기 비율을 계산합니다.
+    final actualPreviewWidth = MediaQuery.of(context).size.width * 0.9; // 카메라 프리뷰의 너비
+    final actualPreviewHeight = actualPreviewWidth * desiredAspectRatio; // 카메라 프리뷰의 높이
 
-    return AspectRatio(
-      aspectRatio: cameraState.cameraController!.value.aspectRatio,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: cameraState.isVideoRecording ? Colors.green : Colors.transparent, // 녹화 중일 때는 초록색 테두리
-            width: 3, // 테두리 두께
-          ),
+        width: actualPreviewWidth,
+        height: actualPreviewHeight,
+        child: OverflowBox(
+          // OverflowBox를 사용하여 카메라 프리뷰가 원하는 비율을 넘어서도록 허용합니다.
+          // 이렇게 하면 가운데 부분만 화면에 표시됩니다.
+          maxWidth: actualPreviewWidth, // 최대 너비
+          maxHeight: actualPreviewWidth / cameraAspectRatio, // 최대 높이
+          child: CameraPreview(cameraState.cameraController!),
         ),
-        child: CameraPreview(cameraState.cameraController!),
       ),
     );
   }

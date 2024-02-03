@@ -50,11 +50,11 @@ class AudioRecordState extends ChangeNotifier {
     await _audioRecorder.stop();// 녹음 중지
     await _uploadRecordToServer();
     print("경로확인 $_audioPath+++++++++++++++++++++++++++++++++");
-    _serverResponseAudioText = '반가워요방가방가';// 서버텍스트로 옮겨지는지 테스트
-    print("==================서버 응답 텍스트: $_serverResponseAudioText");
-    if(onTextAudioReceived != null) {
-      onTextAudioReceived!(_serverResponseAudioText);
-    } // serverResponseText를 콜백 함수로 전달
+    // _serverResponseAudioText = '반가워요방가방가';// 서버텍스트로 옮겨지는지 테스트
+    // print("==================서버 응답 텍스트: $_serverResponseAudioText");
+    // if(onTextAudioReceived != null) {
+    //   onTextAudioReceived!(_serverResponseAudioText);
+    // } // serverResponseText를 콜백 함수로 전달
     _isRecording = false; // 녹음 중이 아님으로 변경
     notifyListeners();
   }
@@ -85,6 +85,9 @@ class AudioRecordState extends ChangeNotifier {
           _serverResponseAudioText = responseData['text']; // 'text' 값 추출
           print("서버 응답 텍스트: $_serverResponseAudioText");
           upLoadText = "파일 업로드 성공!";
+          if(onTextAudioReceived != null) {
+            onTextAudioReceived!(_serverResponseAudioText);
+          } // serverResponseText를 콜백 함수로 전달
         } else {
           print("응답에 'text' 키가 없습니다.");
           upLoadText = "응답 데이터 오류!";

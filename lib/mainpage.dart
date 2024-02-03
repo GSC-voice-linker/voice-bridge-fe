@@ -102,18 +102,7 @@ class _MainpageState extends State<Mainpage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            ClipRRect( //카메라 뷰 출력 화면
-              borderRadius: BorderRadius.circular(12), // 원하는 둥근 모서리 반경 설정
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.9, //좌우의 50퍼센트만씀
-                height: MediaQuery.of(context).size.width * (3 / 4) * 0.9, //그 50퍼센트에서 4대3비율로 출력
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: CameraView(), // 카메라 뷰어
-              ),
-            ),
+            CameraView(),
             const SizedBox(height: 29),
             Expanded(
               flex: 3,
