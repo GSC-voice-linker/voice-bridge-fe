@@ -12,7 +12,7 @@ class CameraView extends StatefulWidget {
 class _CameraViewState extends State<CameraView> {
   @override
   Widget build(BuildContext context) {
-    var cameraState = Provider.of<CameraState>(context);
+    var cameraState = Provider.of<CameraRecordState>(context);
 
     if (!cameraState.isCameraInitialized) {
       return Center(child: CircularProgressIndicator());
@@ -36,7 +36,7 @@ class _CameraViewState extends State<CameraView> {
 class CameraControlWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var cameraState = Provider.of<CameraState>(context, listen: false);
+    var cameraState = Provider.of<CameraRecordState>(context, listen: false);
 
     return Scaffold(
       body: Column(

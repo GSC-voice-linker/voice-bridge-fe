@@ -28,18 +28,12 @@ class _MainpageState extends State<Mainpage> {
   @override
   void initState() {//초기화
     super.initState();//부모클래스의 initState 호출
-    // _loadMessages(); // 메세지 불러오기
     _loadMessagesFromServer();
   }
-  //
-  // Future<void> _loadMessages() async {
-  //   // 메시지를 불러오는 로직 (임시 데이터 사용)
-  //   messages = await MessageService.getMessages();
-  //   setState(() {});
-  // }
+
 
   Future<void> _loadMessagesFromServer() async {
-    // Provider를 사용하여 MessageProvider에 접근합니다.
+    // Provider를 사용하여 MessageProvider에 접근.
     await Provider.of<MessageProvider>(context, listen: false).getMessagesFromServer();
     // MessageProvider 내부에서 notifyListeners()를 호출하면
     // Provider를 통해 UI가 자동으로 업데이트
@@ -54,14 +48,17 @@ class _MainpageState extends State<Mainpage> {
   @override
 
   Widget build(BuildContext context) { //main페이지 빌드
-    var cameraState = Provider.of<CameraState>(context); // 카메라 상태 가져오기
+    var cameraState = Provider.of<CameraRecordState>(context, listen: true); // 카메라 상태 가져오기
     // var recordState = Provider.of<AudioRecordState>(context); // 녹음 상태 가져오기
     var recordState = Provider.of<AudioRecordState>(context, listen: true);
     // var chatState = Provider.of<MessageProvider>(context, listen: false);
 
-    recordState.onTextReceived = (text) {
+    recordState.onTextAudioReceived = (text) {
       Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
-    };
+    }; // 녹음 중지 후 콜백 함수로 메시지 추가
+    cameraState.onTextCameraReceived = (text) {
+      Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
+    }; // 카메라 녹화 중지 후 콜백 함수로 메시지 추가
 
 
     return Scaffold(
@@ -106,7 +103,7 @@ class _MainpageState extends State<Mainpage> {
                   child: Column(
                     children: <Widget>[
                       // ListView.builder추가하기
-                      Expanded(child: MessageListView(messages: messages)), // 메세지 리스트뷰
+                      Expanded(child: MessageListView()), // 메세지 리스트뷰
                     ],
                   ),
                   // 채팅 화면 컨테이너 스타일 설정
@@ -128,19 +125,13 @@ class _MainpageState extends State<Mainpage> {
                   ),
                   onPressed: () {
                     if (recordState.isRecording) {
-                      print('========================${recordState.isRecording}========================');
                       recordState.stopRecording(); // 녹음 중지
-                      print('녹음중지로 바뀌었나?===========================================');
-                      print('========================${recordState.isRecording}========================');
                       // 콜백을 통해 ChatState에 메시지 추가
-                      recordState.onTextReceived = (text) {
+                      recordState.onTextAudioReceived = (text) {
                         Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
-                      };
+                      }; // 녹음 중지 후 콜백 함수로 메시지 추가
                     } else {
-                      print('========================${recordState.isRecording}========================');
                       recordState.startRecording(); // 녹음 시작
-                      print('녹음시작로 바뀌었나?===========================================');
-                      print('========================${recordState.isRecording}========================');
                     }
                   },
                 ),
@@ -152,12 +143,11 @@ class _MainpageState extends State<Mainpage> {
                   onPressed: () {
                     if (cameraState.isVideoRecording) {
                       cameraState.stopRecording(); //CanmeraState의 stopRecording() 메서드 호출
-                      print('카메라 중지하기===========================================');
-                      print('========================${cameraState.isVideoRecording}========================');
+                      cameraState.onTextCameraReceived = (text) {
+                        Provider.of<MessageProvider>(context, listen: true).addMessage(text, true);
+                      }; // 녹음 중지 후 콜백 함수로 메시지 추가
                     } else {
-                      cameraState.startRecording(); //CanmeraState의 startRecording() 메서드 호출
-                      print('카메라 실행하기?===========================================');
-                      print('========================${cameraState.isVideoRecording}========================');
+                      cameraState.startRecording(); //CanmeraState의 startRecording() 메서드 호출);
                     }
                   },
                 ),

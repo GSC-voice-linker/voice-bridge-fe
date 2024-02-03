@@ -2,14 +2,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:convert';
 import  'package:dio/dio.dart';
-import 'package:voice_bridge_main/chat/chat_state.dart';
-import 'package:voice_bridge_main/chat/chat_service.dart';
+
 
 class AudioRecordState extends ChangeNotifier {
   final AudioRecorder _audioRecorder = AudioRecorder(); // 녹음 객체(클래스 내에서만 쓰이고,private)
@@ -19,14 +16,13 @@ class AudioRecordState extends ChangeNotifier {
   bool get isRecording => _isRecording;
   String get audioPath => _audioPath;
   String _serverResponseAudioText = ''; //  서버로부터 받은 텍스트 저장하는 변수
-
   String get severResponseAudioText => _serverResponseAudioText; // 서버로부터 받은 텍스트 반환
   String upLoadText = ''; // 업로드 상태 저장 변수
   String upLoadText2 = ''; // 파일 존재여부
 
   // 콜백 함수 추가 mainplage에서 텍스트를 chat list로 넘겨주기 위함
-  Function(String)? onTextReceived;// 콜백 함수
-  AudioRecordState({this.onTextReceived});
+  Function(String)? onTextAudioReceived;// 콜백 함수
+  AudioRecordState({this.onTextAudioReceived});
 
   Future<void> startRecording() async { // 녹음을 시작하는 함수
     _isRecording = true;// 녹음 중 상태로 변경
@@ -56,13 +52,12 @@ class AudioRecordState extends ChangeNotifier {
     print("경로확인 $_audioPath+++++++++++++++++++++++++++++++++");
     _serverResponseAudioText = '반가워요방가방가';// 서버텍스트로 옮겨지는지 테스트
     print("==================서버 응답 텍스트: $_serverResponseAudioText");
-    if(onTextReceived != null) {
-      onTextReceived!(_serverResponseAudioText);
+    if(onTextAudioReceived != null) {
+      onTextAudioReceived!(_serverResponseAudioText);
     } // serverResponseText를 콜백 함수로 전달
     _isRecording = false; // 녹음 중이 아님으로 변경
     notifyListeners();
   }
-
 
   // 서버에 녹음 파일 업로드
   Future<void> _uploadRecording() async {

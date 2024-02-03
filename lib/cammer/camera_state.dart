@@ -10,17 +10,20 @@ import 'package:dio/dio.dart';
 //카메라 상태 관리
 //카메라 로직 구현
 
-class CameraState extends ChangeNotifier {
+class CameraRecordState extends ChangeNotifier {
   CameraController? _cameraController; // 카메라 제어를 위한 변수
   bool _isVideoRecording = false; // 녹화 중인지 여부를 저장하는 변수
   String _videoPath = ""; // 녹화된 파일의 경로를 저장하는 변수
-  String serverResponseCameraText = ''; //  서버로부터 받은 오디오 텍스트 저장하는 변수
-  String get severResponseCameraText => serverResponseCameraText; // 서버로부터 받은 오디오 텍스트 반환
+  String _serverResponseCameraText = ''; //  서버로부터 받은 오디오 텍스트 저장하는 변수
+  String get severResponseCameraText => _serverResponseCameraText; // 서버로부터 받은 텍스트 반환
   String get cameraPath => _videoPath;
 
-
-  CameraState() {
-    _initializeCamera(); // 카메라 초기화
+  // CameraState() {
+  //   _initializeCamera(); // 카메라 초기화
+  // }
+  Function(String)? onTextCameraReceived; // 콜백 함수
+  CameraRecordState({this.onTextCameraReceived}) {
+    _initializeCamera();
   }
 
   CameraController? get cameraController => _cameraController; // 카메라 제어 변수 반환
@@ -50,9 +53,7 @@ class CameraState extends ChangeNotifier {
   }
 
 
-  void startRecording() async {
-    // 녹화 시작 함수
-
+  void startRecording() async {// 녹화 시작 함수
     _isVideoRecording = true; // 녹화 중 상태로 변경
     // final directory = await getTemporaryDirectory(); // 임시 디렉토리 경로 가져오기
     // _cameraPath = '${directory.path}/video.mp4';// 파일 경로 생성 및 반환
@@ -61,24 +62,27 @@ class CameraState extends ChangeNotifier {
   }
 
   void stopRecording() async {
-    final XFile? rawVideoFile = await _cameraController?.stopVideoRecording();
-
+    final XFile? rawVideoFile = await _cameraController?.stopVideoRecording(); // 카메라 녹화 중지
+    _serverResponseCameraText = '카메라 스탑레코딩 테스트메시지===';// 서버텍스트로 옮겨지는지 테스트
+    print("==================카메라 응답 텍스트: $_serverResponseCameraText");
+    if(onTextCameraReceived != null) {
+      onTextCameraReceived!(_serverResponseCameraText);
+    } // serverResponseText를 콜백 함수로 전달
     if (rawVideoFile != null) {
       // 애플리케이션 문서 디렉토리에 비디오 파일 저장할 경로 지정
       final Directory appDocDir = await getApplicationDocumentsDirectory();
       final String videoPath = '${appDocDir.path}/my_video.mp4';
-
       // 녹화된 비디오 파일을 지정된 경로로 이동
-      await rawVideoFile.saveTo(videoPath);
-
-      print("비디오 파일이 저장된 경로: $videoPath");
+      await rawVideoFile.saveTo(videoPath); // 비디오 파일 저장
+      print("비디오 파일이 저장된 경로: $videoPath"); // 비디오 파일 경로 출력
       _videoPath = videoPath; // _videoPath 변수 업데이트
-      notifyListeners();
       await _uploadVideoToServer(); // 수정된 부분: videoPath를 인자로 전달
+      // notifyListeners(); // 상태 변경 알림
     }
+    print('stop을눌렀을떄 false로 돌아오기전=====================');
     _isVideoRecording = false; // 녹화 중이 아님으로 변경
+    print('stop을눌렀을떄 false로 돌아오는가?=====================$_isVideoRecording');
     notifyListeners(); // 상태 변경 알림
-
   }
 
   Future<void> _uploadVideoToServer() async {
@@ -113,7 +117,7 @@ class CameraState extends ChangeNotifier {
             "비디오 파일 업로드 성공!+++++++++++++++++++++++++++++++++++++++++++++++++");
         final responseData = response.data;
         if (responseData.containsKey('text')) {
-          serverResponseCameraText = responseData['text']; // 'text' 값 추출
+          _serverResponseCameraText = responseData['text']; // 'text' 값 추출
           // 추가적인 성공 로직 처리
         }
       }else {

@@ -10,10 +10,9 @@ void main() {
   runApp(
     MultiProvider( // 여러 객체 상태 관리
       providers: [
-        ChangeNotifierProvider(create: (context) => CameraState()),
+        ChangeNotifierProvider(create: (context) => CameraRecordState()),
         ChangeNotifierProvider(create: (context) => AudioRecordState()),
         ChangeNotifierProvider(create: (context) => MessageProvider()),
-
       ],
       child: MyApp(),
     ),

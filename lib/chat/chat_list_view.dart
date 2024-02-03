@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'chat_bubble.dart';
 import 'chat_state.dart';
+import 'package:provider/provider.dart';
 
 class MessageListView extends StatefulWidget {
-  final List<Message> messages;
+  // final List<Message> messages;
 
-  const MessageListView({Key? key, required this.messages}) : super(key: key);
+  // const MessageListView({Key? key, required this.messages}) : super(key: key);
+  const MessageListView({Key? key}) : super(key: key);
 
   @override
   _MessageListViewState createState() => _MessageListViewState(); // 상태 클래스를 반환
@@ -30,13 +32,16 @@ class _MessageListViewState extends State<MessageListView> {
 
   @override
   Widget build(BuildContext context) {
+    var messageProvider = Provider.of<MessageProvider>(context);
+    var messages = messageProvider.messages; // messages 리스트를 가져옴
     return Scrollbar(
       controller: _scrollController, // ScrollController를 Scrollbar와 ListView에 연결
       child: ListView.builder(
         controller: _scrollController, // 동일한 ScrollController를 사용
-        itemCount: widget.messages.length,
+        itemCount: messages.length,
         itemBuilder: (context, index) {
-          final message = widget.messages[index];
+          // final message = widget.messages[index];
+          final message = messages[index]; // widget.messages 대신 messages를 사용
           return ChatBubble(message: message);
         },
       ),
