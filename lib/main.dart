@@ -13,6 +13,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => CameraState()),
         ChangeNotifierProvider(create: (context) => AudioRecordState()),
         ChangeNotifierProvider(create: (context) => MessageProvider()),
+
       ],
       child: MyApp(),
     ),

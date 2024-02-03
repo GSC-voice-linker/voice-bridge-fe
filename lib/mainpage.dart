@@ -6,8 +6,8 @@ import 'cammer/camera_state.dart'; //카메라 상태관리, 카메라 함수들
 import 'record/audio_record_state.dart'; // 녹음 위젯(녹음버튼)
 import 'package:voice_bridge_main/chat/chat_state.dart'; //메세지 모델
 import 'package:voice_bridge_main/chat/chat_list_view.dart'; //메세지 리스트뷰
-import 'package:voice_bridge_main/chat/chat_service.dart'; //메세지 버블
 import 'package:flutter_svg/flutter_svg.dart'; //svg 이미지 라이브러리
+
 
 class Mainpage extends StatefulWidget {
   const Mainpage({super.key});//
@@ -28,13 +28,21 @@ class _MainpageState extends State<Mainpage> {
   @override
   void initState() {//초기화
     super.initState();//부모클래스의 initState 호출
-    _loadMessages(); // 메세지 불러오기
+    // _loadMessages(); // 메세지 불러오기
+    _loadMessagesFromServer();
   }
+  //
+  // Future<void> _loadMessages() async {
+  //   // 메시지를 불러오는 로직 (임시 데이터 사용)
+  //   messages = await MessageService.getMessages();
+  //   setState(() {});
+  // }
 
-  Future<void> _loadMessages() async {
-    // 메시지를 불러오는 로직 (임시 데이터 사용)
-    messages = await MessageService.getMessages();
-    setState(() {});
+  Future<void> _loadMessagesFromServer() async {
+    // Provider를 사용하여 MessageProvider에 접근합니다.
+    await Provider.of<MessageProvider>(context, listen: false).getMessagesFromServer();
+    // MessageProvider 내부에서 notifyListeners()를 호출하면
+    // Provider를 통해 UI가 자동으로 업데이트
   }
 
   @override
@@ -48,7 +56,8 @@ class _MainpageState extends State<Mainpage> {
   Widget build(BuildContext context) { //main페이지 빌드
     var cameraState = Provider.of<CameraState>(context); // 카메라 상태 가져오기
     // var recordState = Provider.of<AudioRecordState>(context); // 녹음 상태 가져오기
-    var recordState = Provider.of<AudioRecordState>(context, listen: false);
+    var recordState = Provider.of<AudioRecordState>(context, listen: true);
+    // var chatState = Provider.of<MessageProvider>(context, listen: false);
 
     recordState.onTextReceived = (text) {
       Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
@@ -80,8 +89,8 @@ class _MainpageState extends State<Mainpage> {
             ClipRRect( //카메라 뷰 출력 화면
               borderRadius: BorderRadius.circular(12), // 원하는 둥근 모서리 반경 설정
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.6, //좌우의 50퍼센트만씀
-                height: MediaQuery.of(context).size.width * (4 / 3) * 0.5, //그 50퍼센트에서 4대3비율로 출력
+                width: MediaQuery.of(context).size.width * 0.9, //좌우의 50퍼센트만씀
+                height: MediaQuery.of(context).size.width * (3 / 4) * 0.9, //그 50퍼센트에서 4대3비율로 출력
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black),
                   borderRadius: BorderRadius.circular(12),
@@ -119,9 +128,19 @@ class _MainpageState extends State<Mainpage> {
                   ),
                   onPressed: () {
                     if (recordState.isRecording) {
+                      print('========================${recordState.isRecording}========================');
                       recordState.stopRecording(); // 녹음 중지
+                      print('녹음중지로 바뀌었나?===========================================');
+                      print('========================${recordState.isRecording}========================');
+                      // 콜백을 통해 ChatState에 메시지 추가
+                      recordState.onTextReceived = (text) {
+                        Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
+                      };
                     } else {
+                      print('========================${recordState.isRecording}========================');
                       recordState.startRecording(); // 녹음 시작
+                      print('녹음시작로 바뀌었나?===========================================');
+                      print('========================${recordState.isRecording}========================');
                     }
                   },
                 ),
@@ -133,8 +152,12 @@ class _MainpageState extends State<Mainpage> {
                   onPressed: () {
                     if (cameraState.isVideoRecording) {
                       cameraState.stopRecording(); //CanmeraState의 stopRecording() 메서드 호출
+                      print('카메라 중지하기===========================================');
+                      print('========================${cameraState.isVideoRecording}========================');
                     } else {
                       cameraState.startRecording(); //CanmeraState의 startRecording() 메서드 호출
+                      print('카메라 실행하기?===========================================');
+                      print('========================${cameraState.isVideoRecording}========================');
                     }
                   },
                 ),

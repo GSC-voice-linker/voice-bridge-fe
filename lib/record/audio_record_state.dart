@@ -18,9 +18,9 @@ class AudioRecordState extends ChangeNotifier {
 
   bool get isRecording => _isRecording;
   String get audioPath => _audioPath;
-  String serverResponseText = ''; //  서버로부터 받은 텍스트 저장하는 변수
+  String _serverResponseAudioText = ''; //  서버로부터 받은 텍스트 저장하는 변수
 
-  String get severResponseText => serverResponseText; // 서버로부터 받은 텍스트 반환
+  String get severResponseAudioText => _serverResponseAudioText; // 서버로부터 받은 텍스트 반환
   String upLoadText = ''; // 업로드 상태 저장 변수
   String upLoadText2 = ''; // 파일 존재여부
 
@@ -29,6 +29,7 @@ class AudioRecordState extends ChangeNotifier {
   AudioRecordState({this.onTextReceived});
 
   Future<void> startRecording() async { // 녹음을 시작하는 함수
+    _isRecording = true;// 녹음 중 상태로 변경
     if (await _audioRecorder.hasPermission()) {
       final config = RecordConfig( // 녹음 설정
         encoder: AudioEncoder.aacLc,
@@ -36,11 +37,12 @@ class AudioRecordState extends ChangeNotifier {
         sampleRate: 44100,
         numChannels: 1, // 채널 수를 1로 설정하여 모노 녹음
       );
+
       final directory = await getTemporaryDirectory(); // 임시 디렉토리 경로 가져오기
       _audioPath = '${directory.path}/audio.aac';// 파일 경로 생성 및 반환
 
       await _audioRecorder.start(config, path: _audioPath); //파일 경로로 녹음 시작
-      _isRecording = true;// 녹음 중 상태로 변경
+
       notifyListeners(); // 상태 변경 알림
       print("START RECODING+++++++++++++++++++++++++++++++++++++++++++++++++");
     }
@@ -50,25 +52,24 @@ class AudioRecordState extends ChangeNotifier {
   Future<void> stopRecording() async { // 녹음 중지 함수
     print("STOP RECODING+++++++++++++++++++++++++++++++++++++++++++++++++");
     await _audioRecorder.stop();// 녹음 중지
-    _isRecording = false; // 녹음 중이 아님으로 변경
-    notifyListeners();
     await _uploadRecording();
     print("경로확인 $_audioPath+++++++++++++++++++++++++++++++++");
-    serverResponseText = '반가워요';// 'text' 값 추출
-    print("==================서버 응답 텍스트: $serverResponseText");
+    _serverResponseAudioText = '반가워요방가방가';// 서버텍스트로 옮겨지는지 테스트
+    print("==================서버 응답 텍스트: $_serverResponseAudioText");
     if(onTextReceived != null) {
-      onTextReceived!(serverResponseText);
+      onTextReceived!(_serverResponseAudioText);
     } // serverResponseText를 콜백 함수로 전달
+    _isRecording = false; // 녹음 중이 아님으로 변경
+    notifyListeners();
   }
 
 
   // 서버에 녹음 파일 업로드
   Future<void> _uploadRecording() async {
-    print("UPLOAD RECORDING+++++++++++++++++++++++++++++++++++++++++++++++++");
+    print("AUDIO UPLOAD RECORDING+++++++++++++++++++++++++++++++++++++++++++++++++");
     // 서버 URL 수정
     final String url = 'http://35.197.3.194:8000/stt/';
     final File file = File(_audioPath); // _audioPath는 녹음 파일의 경로
-
     if (!file.existsSync()) {
       print("파일이 존재하지 않습니다.");
       upLoadText2 = "파일이 존재하지 않음!";
@@ -86,11 +87,8 @@ class AudioRecordState extends ChangeNotifier {
         // 서버로부터 받은 응답 데이터 처리
         final responseData = response.data;
         if (responseData.containsKey('text')) {
-          serverResponseText = responseData['text']; // 'text' 값 추출
-          print("서버 응답 텍스트: $serverResponseText");
-          if(onTextReceived != null) {
-            onTextReceived!(serverResponseText);
-          } // serverResponseText를 콜백 함수로 전달
+          _serverResponseAudioText = responseData['text']; // 'text' 값 추출
+          print("서버 응답 텍스트: $_serverResponseAudioText");
           upLoadText = "파일 업로드 성공!";
         } else {
           print("응답에 'text' 키가 없습니다.");
@@ -105,7 +103,7 @@ class AudioRecordState extends ChangeNotifier {
       upLoadText = "업로드 오류! 상세 정보 없음";
     }
 
-    // 상태 업데이트를 위한 notifyListeners() 호출 (ChangeNotifier를 상속받은 클래스일 경우)
+    // 상태 업데이트를 위한 notifyListeners() 호출
     notifyListeners();
   }
   @override
