@@ -7,6 +7,7 @@ import 'record/audio_record_state.dart'; // 녹음 위젯(녹음버튼)
 import 'package:voice_bridge_main/chat/chat_state.dart'; //메세지 모델
 import 'package:voice_bridge_main/chat/chat_list_view.dart'; //메세지 리스트뷰
 import 'package:voice_bridge_main/chat/chat_service.dart'; //메세지 버블
+import 'package:flutter_svg/flutter_svg.dart'; //svg 이미지 라이브러리
 
 class Mainpage extends StatefulWidget {
   const Mainpage({super.key});//
@@ -52,6 +53,12 @@ class _MainpageState extends State<Mainpage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('VOICE BRIDGE'),
+        leading: IconButton(
+          icon: SvgPicture.asset('assets/icons/voice.svg'), // 메뉴 아이콘
+          onPressed: () {
+            // Handle menu action
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline),
