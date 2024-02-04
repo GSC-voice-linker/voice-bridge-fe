@@ -102,57 +102,141 @@ class _MainpageState extends State<Mainpage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            CameraView(),
-            const SizedBox(height: 29),
-            Expanded(
-              flex: 3,
-              child: Center(
-                child: Container(
-                  child: Column(
-                    children: <Widget>[
-                      // ListView.builder추가하기
-                      Expanded(child: MessageListView()), // 메세지 리스트뷰
-                    ],
-                  ),
-                  // 채팅 화면 컨테이너 스타일 설정
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
+            Container(
+                height: 560,
+                width: double.infinity,
+                color: Colors.white,
+                child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: CameraView(), // 카메라 뷰를 Stack의 전체 영역에 꽉 차게 배치
+                      ),
+                      Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container( // 하단에 초록색 컨테이너를 위치시킴
+                            height: 280,
+                            color: Colors.white,
+                            child: Column(
+                              children: <Widget>[
+                                Container(
+                                  height: 33,
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      top: BorderSide(
+                                        color: Colors.black, // 테두리 색상
+                                        width: 2.0, // 테두리 두께
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                Expanded(
+                                  flex: 3,
+                                  child: Center(
+                                    child: Container(
+                                      child: Column(
+                                        children: <Widget>[
+                                          // ListView.builder추가하기
+                                          Expanded(child: MessageListView()), // 메세지 리스트뷰
+                                        ],
+                                      ),
+                                      // 채팅 화면 컨테이너 스타일 설정
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.black),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          )
+                      ),
+                    ]
+                )
             ),
+
             const SizedBox(height: 33),
             Consumer2<AudioRecordState, CameraRecordState>(
               builder: (context, audioRecordState, cameraState, child) {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    IconButton(
-                      icon: Icon(
-                        audioRecordState.isRecording ? Icons.stop : Icons.mic,
-                        size: 50,
-                      ),
-                      onPressed: () {
-                        if (audioRecordState.isRecording) {
-                          audioRecordState.stopRecording();
-                        } else {
-                          audioRecordState.startRecording();
-                        }
-                      },
+                    Container(
+                      width: 150,
+                      height: 70,
+                        decoration: BoxDecoration(
+                          color: audioRecordState.isRecording ? Colors.grey[600] : Colors.grey[400],
+                          borderRadius: BorderRadius.circular(35),
+                        ),
+                      child: GestureDetector(
+                        onTap: () {
+                          print("Container tapped!");
+                          // 여기에 탭했을 때 수행할 작업을 추가
+                          if (audioRecordState.isRecording) {
+                            audioRecordState.stopRecording();
+                          } else {
+                            audioRecordState.startRecording();
+                          }
+                        },
+                        child: Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center, // 가로축을 기준으로 자식들을 중앙에 배치합니다.
+                            children: <Widget>[
+                                Icon(
+                                  audioRecordState.isRecording ? Icons.stop : Icons.mic,
+                                  size: 50,
+                                ),
+                              SizedBox.fromSize(size: Size(6, 0)), //마이크랑 텍스트 간 여백 추가
+                              Text(
+                                audioRecordState.isRecording ? "OFF" : "ON", //녹음 온오프 텍스트 표시
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  color: Colors.black,
+                                ),),
+                            ],
+                          ),
+                        ),
+                      )
                     ),
-                    IconButton(
-                      icon: Icon(
-                        cameraState.isVideoRecording ? Icons.videocam_off : Icons.videocam,
-                        size: 50,
-                      ),
-                      onPressed: () {
-                        if (cameraState.isVideoRecording) {
-                          cameraState.stopRecording();
-                        } else {
-                          cameraState.startRecording();
-                        }
-                      },
+                    Container( //카메라버튼
+                        width: 150,
+                        height: 70,
+                        decoration: BoxDecoration(
+                          color: cameraState.isVideoRecording ? Colors.green[600] : Colors.green[400],
+                          borderRadius: BorderRadius.circular(35),
+                        ),
+                        child: GestureDetector(
+                          onTap: () {
+                            print("Container tapped!");
+                            // 여기에 탭했을 때 수행할 작업을 추가
+                            if (cameraState.isVideoRecording) {
+                              cameraState.stopRecording();
+                            } else {
+                              cameraState.startRecording();
+                            }
+                          },
+                          child: Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center, // 가로축을 기준으로 자식들을 중앙에 배치합니다.
+                              children: <Widget>[
+                                Icon(
+                                  cameraState.isVideoRecording ? Icons.stop : Icons.videocam,
+                                  size: 50,
+                                ),
+                                SizedBox.fromSize(size: Size(6, 0)), //마이크랑 텍스트 간 여백 추가
+                                Text(
+                                  cameraState.isVideoRecording ? "OFF" : "ON", //녹음 온오프 텍스트 표시
+                                  style: TextStyle(
+                                    fontSize: 25,
+                                    color: Colors.white,
+                                  ),),
+                              ],
+                            ),
+                          ),
+                        )
                     ),
                   ],
                 );
