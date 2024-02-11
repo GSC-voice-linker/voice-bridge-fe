@@ -2,34 +2,77 @@
 import 'package:flutter/material.dart';
 
 class Message {
-  final String text; // 메시지를 담을 변수
-  final bool isMine;  // ture라면 내가 보낸 것 false라면 상대방이 보낸 것
+  String id;
+  String text;
+  bool isMine;
 
-  Message({required this.text, required this.isMine});
+  Message({required this.id, required this.text, required this.isMine});
 }
-// 메시지 상태 관리를 위한 Provider
 class MessageProvider with ChangeNotifier {
   List<Message> messages = [];
-  // 새 메시지를 리스트에 추가하는 메소드
-  void addMessage(String text, bool isMine) {
-    final message = Message(text: text, isMine: isMine);
-    // messages.insert(0, message); // 메시지 리스트의 시작 부분에 추가
-    messages.add(message); // 리스트의 끝에 메시지 추가
-    print('Message added: $text'); // 콘솔에 메시지 추가 출력
-    notifyListeners(); // UI 업데이트
+  String? _tempAudioMessageId;
+  String? _tempVideoMessageId;
+
+  // 임시 메시지 추가 및 ID 반환 (구분자 추가)
+  String addTemporaryMessage({required bool isAudio}) {
+    String tempId = DateTime.now().millisecondsSinceEpoch.toString();
+    final tempMessage = Message(
+        id: tempId,
+        text: isAudio ? "음성 녹음 중..." : "비디오 녹화 중...",
+        isMine: !isAudio
+    );
+    messages.add(tempMessage);
+    notifyListeners();
+
+    if (isAudio) {
+      _tempAudioMessageId = tempId;
+    } else {
+      _tempVideoMessageId = tempId;
+    }
+
+    return tempId;
+  }
+
+  // 기존 메시지 추가 메소드
+  void addMessage(String text, bool isMine, {String? messageIdToUpdate}) {
+    if (messageIdToUpdate != null) {
+      // 기존 임시 메시지 업데이트
+      int index = messages.indexWhere((msg) => msg.id == messageIdToUpdate);
+      if (index != -1) {
+        messages[index].text = text;
+      } else {
+        // 찾지 못한 경우 새 메시지 추가
+        String messageId = DateTime.now().millisecondsSinceEpoch.toString();
+        final message = Message(id: messageId, text: text, isMine: isMine);
+        messages.add(message);
+      }
+    } else {
+      // 새 메시지 추가
+      String messageId = DateTime.now().millisecondsSinceEpoch.toString();
+      final message = Message(id: messageId, text: text, isMine: isMine);
+      messages.add(message);
+    }
+    notifyListeners();
+  }
+
+  // 메시지 업데이트
+  void updateMessage(String idToUpdate, String newText) {
+    int index = messages.indexWhere((msg) => msg.id == idToUpdate);
+    if (index != -1) {
+      messages[index].text = newText;
+      notifyListeners();
+    }
   }
 
   // 서버로부터 메시지를 가져와 리스트를 업데이트하는 메소드
   Future<void> getMessagesFromServer() async {
-    // 서버로부터 메시지를 가져오는 로직을 구현
-    // 여기서는 예시로 하드코딩된 데이터를 사용
     List<Message> serverMessages = [
-      Message(text: '서버로부터의 메시지1', isMine: true),
-      Message(text: '서버로부터의 메시지2', isMine: false)
+      Message(id: DateTime.now().millisecondsSinceEpoch.toString(), text: '서버로부터의 메시지1', isMine: true),
+      Message(id: DateTime.now().millisecondsSinceEpoch.toString(), text: '서버로부터의 메시지2', isMine: false),
     ];
 
-    messages.addAll(serverMessages); // 가져온 메시지를 기존 리스트에 추가
-    print('-----------------------------------------------Messages from server added: ${serverMessages.length}'); // 콘솔에 추가된 메시지 수 출력
-    notifyListeners(); // UI 업데이트
+    messages.addAll(serverMessages);
+    print('Messages from server added: ${serverMessages.length}');
+    notifyListeners();
   }
 }

@@ -8,7 +8,6 @@ import 'package:voice_bridge_main/chat/chat_state.dart'; //메세지 모델
 import 'package:voice_bridge_main/chat/chat_list_view.dart'; //메세지 리스트뷰
 import 'package:flutter_svg/flutter_svg.dart'; //svg 이미지 라이브러리
 
-
 class Mainpage extends StatefulWidget {
   const Mainpage({super.key});// //생성자
 
@@ -27,25 +26,44 @@ class _MainpageState extends State<Mainpage> {
     _loadMessagesFromServer();
     _initializeCallbacks();
   }
-
   void _initializeCallbacks() {
     // 여기에서 콜백 함수를 설정합니다.
-    // 예를 들어, CameraState와 AudioRecordState에서 사용할 콜백 함수를 설정할 수 있습니다.
-    final cameraState = Provider.of<CameraRecordState>(context, listen: false);
-    final recordState = Provider.of<AudioRecordState>(context, listen: false);
+    final cameraState = Provider.of<CameraRecordState>(context, listen: false); // 카메라 상태 가져오기
+    final recordState = Provider.of<AudioRecordState>(context, listen: false); // 녹음 상태 가져오기
+
+    // 녹화 시작 시 임시 메시지 추가 로직
+    cameraState.onStartRecording = () {
+      // 비디오 녹화 시작 시 임시 메시지 추가하고, 임시 메시지의 ID를 저장합니다.
+      String tempVideoMessageId = Provider.of<MessageProvider>(context, listen: false).addTemporaryMessage(isAudio: false);
+      cameraState.tempVideoMessageId = tempVideoMessageId; // 카메라 상태에 임시 메시지 ID 저장
+    };
 
     cameraState.onTextCameraReceived = (text) {
-      Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
+      // '녹화중...' 메시지가 추가된 상태에서 텍스트를 받으면, 해당 메시지를 실제 텍스트로 업데이트
+      if(cameraState.tempVideoMessageId != null) {
+        Provider.of<MessageProvider>(context, listen: false).updateMessage(cameraState.tempVideoMessageId!, text);
+      }
+    };
+
+    // 녹음 시작 시 임시 메시지 추가 로직
+    recordState.onStartRecording = () {
+      // 오디오 녹음 시작 시 임시 메시지 추가하고, 임시 메시지의 ID를 저장합니다.
+      String tempAudioMessageId = Provider.of<MessageProvider>(context, listen: false).addTemporaryMessage(isAudio: true);
+      recordState.tempAudioMessageId = tempAudioMessageId; // 녹음 상태에 임시 메시지 ID 저장
     };
 
     recordState.onTextAudioReceived = (text) {
-      Provider.of<MessageProvider>(context, listen: false).addMessage(text, false);
+      // '음성 녹음 중...' 메시지가 추가된 상태에서 텍스트를 받으면, 해당 메시지를 실제 텍스트로 업데이트
+      if(recordState.tempAudioMessageId != null) {
+        Provider.of<MessageProvider>(context, listen: false).updateMessage(recordState.tempAudioMessageId!, text);
+      }
     };
   }
 
-  Future<void> _loadMessagesFromServer() async {
+
+  Future<void> _loadMessagesFromServer() async { // 서버로부터 메시지를 가져오는 함수
     // Provider를 사용하여 MessageProvider에 접근.
-    await Provider.of<MessageProvider>(context, listen: false).getMessagesFromServer();
+    await Provider.of<MessageProvider>(context, listen: false).getMessagesFromServer(); // 서버로부터 메시지 가져오기
     // MessageProvider 내부에서 notifyListeners()를 호출하면
     // Provider를 통해 UI가 자동으로 업데이트
   }
@@ -59,35 +77,21 @@ class _MainpageState extends State<Mainpage> {
   @override
 
   Widget build(BuildContext context) { //main페이지 빌드
-    // var cameraState = Provider.of<CameraRecordState>(context, listen: true); // 카메라 상태 가져오기
-    // // var recordState = Provider.of<AudioRecordState>(context); // 녹음 상태 가져오기
-    // var recordState = Provider.of<AudioRecordState>(context, listen: true);
-    // // var chatState = Provider.of<MessageProvider>(context, listen: false);
-    // if(!_isCallbackSet) {
-    //   recordState.onTextAudioReceived = (text) {
-    //     Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
-    //   }; // 녹음 중지 후 콜백 함수로 메시지 추가
-    //   cameraState.onTextCameraReceived = (text) {
-    //     Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
-    //   }; // 카메라 녹화 중지 후 콜백 함수로 메시지 추가
-    //   _isCallbackSet = true;
-    // }
-
-    // recordState.onTextAudioReceived = (text) {
-    //   Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
-    // }; // 녹음 중지 후 콜백 함수로 메시지 추가
-    // cameraState.onTextCameraReceived = (text) {
-    //   Provider.of<MessageProvider>(context, listen: false).addMessage(text, true);
-    // }; // 카메라 녹화 중지 후 콜백 함수로 메시지 추가
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('VOICE BRIDGE'),
-        leading: IconButton(
-          icon: SvgPicture.asset('assets/icons/voice.svg'), // 메뉴 아이콘
-          onPressed: () {
-            // Handle menu action
-          },
+        title: Text(
+            'VOICE BRIDGE',
+            style: TextStyle(fontFamily: 'GmarketSansMedium',
+            fontSize: 25)
+        ),
+        leading: Padding(
+          padding: EdgeInsets.only(left: 20), // 왼쪽 여백을 20으로 설정
+          child: Image.asset(
+            'assets/icons/image_1-removebg-preview 2.png',
+            width: 50, // 이미지의 폭을 적절히 조정하세요
+            height: AppBar().preferredSize.height, // AppBar의 높이에 맞춰 이미지 높이 조정
+            fit: BoxFit.scaleDown, // 비율을 유지하면서 컨테이너에 맞게 이미지 조정
+          ),
         ),
         actions: [
           IconButton(
@@ -103,7 +107,7 @@ class _MainpageState extends State<Mainpage> {
         child: Column(
           children: <Widget>[
             Container(
-                height: 560,
+                height: 590,
                 width: double.infinity,
                 color: Colors.white,
                 child: Stack(
@@ -120,15 +124,16 @@ class _MainpageState extends State<Mainpage> {
                             color: Colors.white,
                             child: Column(
                               children: <Widget>[
-                                Container(
-                                  height: 33,
+                                Container( //채팅위에 가리기용
+                                  height: 25,
                                   decoration: BoxDecoration(
                                     border: Border(
                                       top: BorderSide(
-                                        color: Colors.black, // 테두리 색상
-                                        width: 2.0, // 테두리 두께
+                                        color: Colors.grey, // 테두리 색상
+                                        width: 1.0, // 테두리 두께
                                       ),
                                     ),
+
                                   ),
                                 ),
 
@@ -144,8 +149,17 @@ class _MainpageState extends State<Mainpage> {
                                       ),
                                       // 채팅 화면 컨테이너 스타일 설정
                                       decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.black),
+                                        color: Colors.white,
+                                        border: Border.all(color: Colors.grey),
                                         borderRadius: BorderRadius.circular(12),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),//그림자색상
+                                            spreadRadius: 2,//그림자확산
+                                            blurRadius: 3,//그림자크기
+                                            offset: Offset(0, 3), // changes position of shadow
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -158,24 +172,24 @@ class _MainpageState extends State<Mainpage> {
                 )
             ),
 
-            const SizedBox(height: 33),
+            const SizedBox(height: 25),
             Consumer2<AudioRecordState, CameraRecordState>(
               builder: (context, audioRecordState, cameraState, child) {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
                     Container(
-                      width: 150,
-                      height: 70,
+                      width: 140,
+                      height: 60,
                         decoration: BoxDecoration(
-                          color: audioRecordState.isRecording ? Colors.grey[600] : Colors.grey[400],
+                          color: audioRecordState.isAudioRecording ? Colors.grey[600] : Colors.grey[400],
                           borderRadius: BorderRadius.circular(35),
                         ),
                       child: GestureDetector(
                         onTap: () {
                           print("Container tapped!");
                           // 여기에 탭했을 때 수행할 작업을 추가
-                          if (audioRecordState.isRecording) {
+                          if (audioRecordState.isAudioRecording) {
                             audioRecordState.stopRecording();
                           } else {
                             audioRecordState.startRecording();
@@ -186,13 +200,14 @@ class _MainpageState extends State<Mainpage> {
                             mainAxisAlignment: MainAxisAlignment.center, // 가로축을 기준으로 자식들을 중앙에 배치합니다.
                             children: <Widget>[
                                 Icon(
-                                  audioRecordState.isRecording ? Icons.stop : Icons.mic,
+                                  audioRecordState.isAudioRecording ? Icons.stop : Icons.mic,
                                   size: 50,
                                 ),
                               SizedBox.fromSize(size: Size(6, 0)), //마이크랑 텍스트 간 여백 추가
                               Text(
-                                audioRecordState.isRecording ? "OFF" : "ON", //녹음 온오프 텍스트 표시
+                                audioRecordState.isAudioRecording ? "OFF" : "ON", //녹음 온오프 텍스트 표시
                                 style: TextStyle(
+                                  fontFamily: 'GmarketSansMedium',
                                   fontSize: 25,
                                   color: Colors.black,
                                 ),),
@@ -202,20 +217,22 @@ class _MainpageState extends State<Mainpage> {
                       )
                     ),
                     Container( //카메라버튼
-                        width: 150,
-                        height: 70,
+                        width: 140,
+                        height: 60,
                         decoration: BoxDecoration(
                           color: cameraState.isVideoRecording ? Colors.green[600] : Colors.green[400],
                           borderRadius: BorderRadius.circular(35),
                         ),
                         child: GestureDetector(
                           onTap: () {
-                            print("Container tapped!");
+                            print("녹화버튼눌림!+++++++++++++++++++++++++++++++++++++++");
                             // 여기에 탭했을 때 수행할 작업을 추가
                             if (cameraState.isVideoRecording) {
                               cameraState.stopRecording();
+                              print("녹화버튼안 녹화 중지 로직!+++++++++++++++++++++++++++++++++++++++");
                             } else {
                               cameraState.startRecording();
+                              print("녹화버튼안 녹화 시작 로직!+++++++++++++++++++++++++++++++++++++++");
                             }
                           },
                           child: Container(
