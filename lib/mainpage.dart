@@ -23,7 +23,7 @@ class _MainpageState extends State<Mainpage> {
   @override
   void initState() {//초기화
     super.initState();//부모클래스의 initState 호출
-    _loadMessagesFromServer();
+    // _loadMessagesFromServer();
     _initializeCallbacks();
   }
   void _initializeCallbacks() {
@@ -41,7 +41,7 @@ class _MainpageState extends State<Mainpage> {
     cameraState.onTextCameraReceived = (text) {
       // '녹화중...' 메시지가 추가된 상태에서 텍스트를 받으면, 해당 메시지를 실제 텍스트로 업데이트
       if(cameraState.tempVideoMessageId != null) {
-        Provider.of<MessageProvider>(context, listen: false).updateMessage(cameraState.tempVideoMessageId!, text);
+        Provider.of<MessageProvider>(context, listen: false).updateMessage(cameraState.tempVideoMessageId!, text,true);
       }
     };
 
@@ -55,18 +55,18 @@ class _MainpageState extends State<Mainpage> {
     recordState.onTextAudioReceived = (text) {
       // '음성 녹음 중...' 메시지가 추가된 상태에서 텍스트를 받으면, 해당 메시지를 실제 텍스트로 업데이트
       if(recordState.tempAudioMessageId != null) {
-        Provider.of<MessageProvider>(context, listen: false).updateMessage(recordState.tempAudioMessageId!, text);
+        Provider.of<MessageProvider>(context, listen: false).updateMessage(recordState.tempAudioMessageId!, text, false);
       }
     };
   }
 
-
-  Future<void> _loadMessagesFromServer() async { // 서버로부터 메시지를 가져오는 함수
-    // Provider를 사용하여 MessageProvider에 접근.
-    await Provider.of<MessageProvider>(context, listen: false).getMessagesFromServer(); // 서버로부터 메시지 가져오기
-    // MessageProvider 내부에서 notifyListeners()를 호출하면
-    // Provider를 통해 UI가 자동으로 업데이트
-  }
+  //
+  // Future<void> _loadMessagesFromServer() async { // 서버로부터 메시지를 가져오는 함수
+  //   // Provider를 사용하여 MessageProvider에 접근.
+  //   await Provider.of<MessageProvider>(context, listen: false).getMessagesFromServer(); // 서버로부터 메시지 가져오기
+  //   // MessageProvider 내부에서 notifyListeners()를 호출하면
+  //   // Provider를 통해 UI가 자동으로 업데이트
+  // }
 
   @override
   void dispose() {
