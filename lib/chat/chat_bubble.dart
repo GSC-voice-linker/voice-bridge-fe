@@ -23,7 +23,7 @@ class ChatBubble extends StatelessWidget {
                 bottomLeft:  message.isMine ? Radius.circular(12) : Radius.circular(0)
             ),
           ),
-          width: 145,
+          width: 160,
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),  // 채팅 버블의 패딩 설정
           margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8), // 채팅 버블의 마진 설정
           child: Text(

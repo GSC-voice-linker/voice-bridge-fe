@@ -18,7 +18,7 @@ class MessageProvider with ChangeNotifier {
     String tempId = DateTime.now().millisecondsSinceEpoch.toString();
     final tempMessage = Message(
         id: tempId,
-        text: isAudio ? "음성 녹음 중..." : "비디오 녹화 중...",
+        text: isAudio ? "·  ·  ·" : "·  ·  ·",
         isMine: !isAudio
     );
     messages.add(tempMessage);
@@ -67,8 +67,8 @@ class MessageProvider with ChangeNotifier {
   // 서버로부터 메시지를 가져와 리스트를 업데이트하는 메소드
   Future<void> getMessagesFromServer() async {
     List<Message> serverMessages = [
-      Message(id: DateTime.now().millisecondsSinceEpoch.toString(), text: '서버로부터의 메시지1', isMine: true),
-      Message(id: DateTime.now().millisecondsSinceEpoch.toString(), text: '서버로부터의 메시지2', isMine: false),
+      // Message(id: DateTime.now().millisecondsSinceEpoch.toString(), text: '서버로부터의 메시지1', isMine: true),
+      Message(id: DateTime.now().millisecondsSinceEpoch.toString(), text: '음성 테스트 메시지', isMine: false),
     ];
 
     messages.addAll(serverMessages);

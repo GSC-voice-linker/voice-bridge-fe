@@ -81,8 +81,9 @@ class _MainpageState extends State<Mainpage> {
       appBar: AppBar(
         title: Text(
             'VOICE BRIDGE',
-            style: TextStyle(fontFamily: 'GmarketSansMedium',
-            fontSize: 25)
+            style: TextStyle(fontFamily: 'OnlyAppbar',
+            fontWeight: FontWeight.w700,
+            fontSize: 24,),
         ),
         leading: Padding(
           padding: EdgeInsets.only(left: 20), // 왼쪽 여백을 20으로 설정
@@ -201,13 +202,14 @@ class _MainpageState extends State<Mainpage> {
                             children: <Widget>[
                                 Icon(
                                   audioRecordState.isAudioRecording ? Icons.stop : Icons.mic,
-                                  size: 50,
+                                  size: 35,
+                                  color: Colors.black,
                                 ),
                               SizedBox.fromSize(size: Size(6, 0)), //마이크랑 텍스트 간 여백 추가
                               Text(
                                 audioRecordState.isAudioRecording ? "OFF" : "ON", //녹음 온오프 텍스트 표시
                                 style: TextStyle(
-                                  fontFamily: 'GmarketSansMedium',
+                                  // fontFamily: 'GmarketSansMedium',
                                   fontSize: 25,
                                   color: Colors.black,
                                 ),),
@@ -240,8 +242,9 @@ class _MainpageState extends State<Mainpage> {
                               mainAxisAlignment: MainAxisAlignment.center, // 가로축을 기준으로 자식들을 중앙에 배치합니다.
                               children: <Widget>[
                                 Icon(
-                                  cameraState.isVideoRecording ? Icons.stop : Icons.videocam,
-                                  size: 50,
+                                  cameraState.isVideoRecording ? Icons.stop : Icons.pan_tool,
+                                  size: 30,
+                                  color: Colors.white,
                                 ),
                                 SizedBox.fromSize(size: Size(6, 0)), //마이크랑 텍스트 간 여백 추가
                                 Text(
