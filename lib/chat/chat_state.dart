@@ -1,5 +1,6 @@
 //chat_state.dart 파일
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 class Message {
   String id;
@@ -12,6 +13,12 @@ class MessageProvider with ChangeNotifier {
   List<Message> messages = [];
   String? _tempAudioMessageId;
   String? _tempVideoMessageId;
+
+  FlutterTts flutterTts = FlutterTts(); // TTS 객체 생성
+
+  Future<void> speak(String text) async { // TTS로 텍스트 읽기
+    await flutterTts.speak(text); // TTS로 텍스트 읽기
+  }
 
   // 임시 메시지 추가 및 ID 반환 (구분자 추가)
   String addTemporaryMessage({required bool isAudio}) {
@@ -35,6 +42,9 @@ class MessageProvider with ChangeNotifier {
 
   // 기존 메시지 추가 메소드
   void addMessage(String text, bool isMine, {String? messageIdToUpdate}) {
+    if (isMine) {// 사용자가 입력한 메시지인 경우
+      speak(text); // 메시지를 읽어줍니다.
+    }
     if (messageIdToUpdate != null) {
       // 기존 임시 메시지 업데이트
       int index = messages.indexWhere((msg) => msg.id == messageIdToUpdate);
