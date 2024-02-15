@@ -38,7 +38,7 @@ class _MessageListViewState extends State<MessageListView> {
       controller: _scrollController, // ScrollController를 Scrollbar와 ListView에 연결
       child: ListView.builder(
         controller: _scrollController, // 동일한 ScrollController를 사용
-        itemCount: messages.length,
+        itemCount: messages.length, // messages 리스트의 길이만큼 아이템 생성
         itemBuilder: (context, index) {
           // final message = widget.messages[index];
           final message = messages[index]; // widget.messages 대신 messages를 사용

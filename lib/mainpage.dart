@@ -108,7 +108,7 @@ class _MainpageState extends State<Mainpage> {
         child: Column(
           children: <Widget>[
             Container(
-                height: 590,
+                height: 620,
                 width: double.infinity,
                 color: Colors.white,
                 child: Stack(
@@ -121,25 +121,24 @@ class _MainpageState extends State<Mainpage> {
                           left: 0,
                           right: 0,
                           child: Container( // 하단에 초록색 컨테이너를 위치시킴
-                            height: 280,
+                            height: 340,
                             color: Colors.white,
                             child: Column(
                               children: <Widget>[
                                 Container( //채팅위에 가리기용
-                                  height: 25,
+                                  height: 28,
                                   decoration: BoxDecoration(
                                     border: Border(
                                       top: BorderSide(
-                                        color: Colors.grey, // 테두리 색상
-                                        width: 1.0, // 테두리 두께
+                                        color: Colors.black, // 테두리 색상
+                                        width: 0.8, // 테두리 두께
                                       ),
                                     ),
 
                                   ),
                                 ),
-
                                 Expanded(
-                                  flex: 3,
+                                  flex: 1,
                                   child: Center(
                                     child: Container(
                                       child: Column(
@@ -150,16 +149,16 @@ class _MainpageState extends State<Mainpage> {
                                       ),
                                       // 채팅 화면 컨테이너 스타일 설정
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        border: Border.all(color: Colors.grey),
+                                        color: Color(0xffF2F2F2),//채팅배경
+                                        border: Border.all(color: Colors.black, width: 0.8), // 테두리 설정
                                         borderRadius: BorderRadius.circular(12),
                                         boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),//그림자색상
-                                            spreadRadius: 2,//그림자확산
-                                            blurRadius: 3,//그림자크기
-                                            offset: Offset(0, 3), // changes position of shadow
-                                          ),
+                                          // BoxShadow(
+                                          //   color: Colors.grey.withOpacity(0.5),//그림자색상
+                                          //   spreadRadius: ,//그림자확산
+                                          //   blurRadius: 3,//그림자크기
+                                          //   offset: Offset(0, 3), // changes position of shadow
+                                          // ),
                                         ],
                                       ),
                                     ),
@@ -172,8 +171,8 @@ class _MainpageState extends State<Mainpage> {
                     ]
                 )
             ),
-
-            const SizedBox(height: 25),
+//-------- 여기부터 버튼
+            const SizedBox(height:28),
             Consumer2<AudioRecordState, CameraRecordState>(
               builder: (context, audioRecordState, cameraState, child) {
                 return Row(
@@ -182,8 +181,8 @@ class _MainpageState extends State<Mainpage> {
                     Container(
                       width: 140,
                       height: 60,
-                        decoration: BoxDecoration(
-                          color: audioRecordState.isAudioRecording ? Colors.grey[600] : Colors.grey[400],
+                        decoration: BoxDecoration( //녹음버튼
+                          color: audioRecordState.isAudioRecording ? Color(0xff8D8D8D) : Color(0xffD9D9D9),
                           borderRadius: BorderRadius.circular(35),
                         ),
                       child: GestureDetector(
@@ -203,15 +202,16 @@ class _MainpageState extends State<Mainpage> {
                                 Icon(
                                   audioRecordState.isAudioRecording ? Icons.stop : Icons.mic,
                                   size: 35,
-                                  color: Colors.black,
+                                  color: audioRecordState.isAudioRecording ? Colors.white : Colors.black,
                                 ),
                               SizedBox.fromSize(size: Size(6, 0)), //마이크랑 텍스트 간 여백 추가
                               Text(
                                 audioRecordState.isAudioRecording ? "OFF" : "ON", //녹음 온오프 텍스트 표시
                                 style: TextStyle(
-                                  // fontFamily: 'GmarketSansMedium',
+                                  fontFamily: 'OnlyAppbar',
+                                  fontWeight: FontWeight.w700,
                                   fontSize: 25,
-                                  color: Colors.black,
+                                  color: audioRecordState.isAudioRecording ? Colors.white : Colors.black,
                                 ),),
                             ],
                           ),
@@ -222,7 +222,7 @@ class _MainpageState extends State<Mainpage> {
                         width: 140,
                         height: 60,
                         decoration: BoxDecoration(
-                          color: cameraState.isVideoRecording ? Colors.green[600] : Colors.green[400],
+                          color: cameraState.isVideoRecording ?  Color(0xff3FA737) : Color(0xff8BD985), //녹화중일때 색상 왼쪽이 진한거
                           borderRadius: BorderRadius.circular(35),
                         ),
                         child: GestureDetector(
@@ -244,14 +244,16 @@ class _MainpageState extends State<Mainpage> {
                                 Icon(
                                   cameraState.isVideoRecording ? Icons.stop : Icons.pan_tool,
                                   size: 30,
-                                  color: Colors.white,
+                                  color: cameraState.isVideoRecording ? Colors.white : Colors.black,
                                 ),
-                                SizedBox.fromSize(size: Size(6, 0)), //마이크랑 텍스트 간 여백 추가
+                                SizedBox.fromSize(size: Size(10, 0)), //손이랑 텍스트 간 여백 추가
                                 Text(
-                                  cameraState.isVideoRecording ? "OFF" : "ON", //녹음 온오프 텍스트 표시
+                                  cameraState.isVideoRecording ? "OFF" : "ON", //녹화 온오프 텍스트 표시
                                   style: TextStyle(
+                                    fontFamily: 'OnlyAppbar',
+                                    fontWeight: FontWeight.w700,
                                     fontSize: 25,
-                                    color: Colors.white,
+                                    color: cameraState.isVideoRecording ? Colors.white : Colors.black,
                                   ),),
                               ],
                             ),

@@ -23,13 +23,13 @@ class _CameraViewState extends State<CameraView> {
 
     return Container(
       width: double.infinity,
-      height: 590,
+      height: 620,
       decoration: BoxDecoration(
 
         // 여기서 테두리 색상과 둥근 모서리를 설정합니다.
         border: Border.all(
-          color: Colors.grey, // 테두리 색상 설정
-          width: 1, // 테두리 두께 설정
+          color: Colors.black, // 테두리 색상 설정
+          width: 0.8, // 테두리 두께 설정
         ),
         borderRadius: BorderRadius.circular(20), // 둥근 모서리의 반지름 설정
       ),
