@@ -23,7 +23,7 @@ class _CameraViewState extends State<CameraView> {
 
     return Container(
       width: double.infinity,
-      height: 620,
+      height: 600,
       decoration: BoxDecoration(
 
         // 여기서 테두리 색상과 둥근 모서리를 설정합니다.

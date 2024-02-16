@@ -108,7 +108,7 @@ class _MainpageState extends State<Mainpage> {
         child: Column(
           children: <Widget>[
             Container(
-                height: 620,
+                height: 600,
                 width: double.infinity,
                 color: Colors.white,
                 child: Stack(
@@ -189,9 +189,9 @@ class _MainpageState extends State<Mainpage> {
                         onTap: () {
                           print("Container tapped!");
                           // 여기에 탭했을 때 수행할 작업을 추가
-                          if (audioRecordState.isAudioRecording) {
+                          if (audioRecordState.isAudioRecording==true && cameraState.isVideoRecording==false) {
                             audioRecordState.stopRecording();
-                          } else {
+                          } else if(audioRecordState.isAudioRecording==false && cameraState.isVideoRecording==false){
                             audioRecordState.startRecording();
                           }
                         },
@@ -229,10 +229,10 @@ class _MainpageState extends State<Mainpage> {
                           onTap: () {
                             print("녹화버튼눌림!+++++++++++++++++++++++++++++++++++++++");
                             // 여기에 탭했을 때 수행할 작업을 추가
-                            if (cameraState.isVideoRecording) {
+                            if (cameraState.isVideoRecording==true && audioRecordState.isAudioRecording==false) {
                               cameraState.stopRecording();
                               print("녹화버튼안 녹화 중지 로직!+++++++++++++++++++++++++++++++++++++++");
-                            } else {
+                            } else if(cameraState.isVideoRecording==false && audioRecordState.isAudioRecording==false){
                               cameraState.startRecording();
                               print("녹화버튼안 녹화 시작 로직!+++++++++++++++++++++++++++++++++++++++");
                             }
