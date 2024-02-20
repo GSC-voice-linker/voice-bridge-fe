@@ -1,7 +1,5 @@
 # 2023 Solution Challenge: VoiceLinker team
 
-A new Flutter project.
-
 ## Project VoiceBridge
 
 Our team, "Voice-Linker," has developed an interactive communication application for real-time conversations between deaf individuals and non-disabled persons; it converts sign language to text and speech, and captures speech to convert it into text for the deaf. This functionality supports natural, everyday conversations and aims to lower social participation barriers for the deaf community, significantly enhancing social inclusion and opportunities.
