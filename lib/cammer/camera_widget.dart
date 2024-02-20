@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'camera_state.dart';
 import 'package:provider/provider.dart';
 //카메라 뷰어

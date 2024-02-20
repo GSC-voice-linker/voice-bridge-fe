@@ -10,7 +10,10 @@ class Message {
   Message({required this.id, required this.text, required this.isMine});
 }
 class MessageProvider with ChangeNotifier {
-  List<Message> messages = [];
+  List<Message> messages = [
+    Message(id: DateTime.now().millisecondsSinceEpoch.toString(), text: '금요일에 회의 참석 가능하신가요?', isMine: true),
+    Message(id: DateTime.now().millisecondsSinceEpoch.toString(), text: '일정을 한번 확인해보겠습니다 어떤 회의인가요', isMine: false),
+  ];
   String? _tempAudioMessageId;
   String? _tempVideoMessageId;
 

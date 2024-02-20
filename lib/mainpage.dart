@@ -95,11 +95,15 @@ class _MainpageState extends State<Mainpage> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.help_outline),
-            onPressed: () {
-              // Handle help action
-            },
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10), //
+
+            child: IconButton(
+              icon: const Icon(Icons.help_outline, color: Color(0xff5290DB), size: 30,),
+              onPressed: () {
+                // Handle help action
+              },
+            ),
           ),
         ],
       ),
@@ -108,7 +112,7 @@ class _MainpageState extends State<Mainpage> {
         child: Column(
           children: <Widget>[
             Container(
-                height: 600,
+                height: 620,
                 width: double.infinity,
                 color: Colors.white,
                 child: Stack(
@@ -121,12 +125,12 @@ class _MainpageState extends State<Mainpage> {
                           left: 0,
                           right: 0,
                           child: Container( // 하단에 초록색 컨테이너를 위치시킴
-                            height: 340,
+                            height: 280,
                             color: Colors.white,
                             child: Column(
                               children: <Widget>[
                                 Container( //채팅위에 가리기용
-                                  height: 28,
+                                  height: 24,
                                   decoration: BoxDecoration(
                                     border: Border(
                                       top: BorderSide(
@@ -152,14 +156,6 @@ class _MainpageState extends State<Mainpage> {
                                         color: Color(0xffF2F2F2),//채팅배경
                                         border: Border.all(color: Colors.black, width: 0.8), // 테두리 설정
                                         borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          // BoxShadow(
-                                          //   color: Colors.grey.withOpacity(0.5),//그림자색상
-                                          //   spreadRadius: ,//그림자확산
-                                          //   blurRadius: 3,//그림자크기
-                                          //   offset: Offset(0, 3), // changes position of shadow
-                                          // ),
-                                        ],
                                       ),
                                     ),
                                   ),
@@ -172,7 +168,7 @@ class _MainpageState extends State<Mainpage> {
                 )
             ),
 //-------- 여기부터 버튼
-            const SizedBox(height:28),
+            const SizedBox(height:30),
             Consumer2<AudioRecordState, CameraRecordState>(
               builder: (context, audioRecordState, cameraState, child) {
                 return Row(
