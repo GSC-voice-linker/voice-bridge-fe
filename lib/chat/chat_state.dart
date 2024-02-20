@@ -11,8 +11,6 @@ class Message {
 }
 class MessageProvider with ChangeNotifier {
   List<Message> messages = [
-    Message(id: DateTime.now().millisecondsSinceEpoch.toString(), text: '금요일에 회의 참석 가능하신가요?', isMine: true),
-    Message(id: DateTime.now().millisecondsSinceEpoch.toString(), text: '일정을 한번 확인해보겠습니다 어떤 회의인가요', isMine: false),
   ];
   String? _tempAudioMessageId;
   String? _tempVideoMessageId;
@@ -86,14 +84,4 @@ class MessageProvider with ChangeNotifier {
     }
   }
 
-  // 서버로부터 메시지를 가져와 리스트를 업데이트하는 메소드
-  // Future<void> getMessagesFromServer() async {
-  //   List<Message> serverMessages = [
-  //     // Message(id: DateTime.now().millisecondsSinceEpoch.toString(), text: '서버로부터의 메시지1', isMine: true),
-  //     Message(id: DateTime.now().millisecondsSinceEpoch.toString(), text: '음성 테스트 메시지', isMine: false),
-  //   ];
-  //   messages.addAll(serverMessages); // 서버로부터 받은 메시지를 추가
-  //   print('Messages from server added: ${serverMessages.length}');
-  //   notifyListeners();
-  // }
 }

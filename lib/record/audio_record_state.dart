@@ -6,7 +6,7 @@ import 'package:path/path.dart' as path;
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import  'package:dio/dio.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AudioRecordState extends ChangeNotifier {
   final AudioRecorder _audioRecorder = AudioRecorder(); // 녹음 객체(클래스 내에서만 쓰이고,private)
@@ -59,7 +59,7 @@ class AudioRecordState extends ChangeNotifier {
   Future<void> _uploadRecordToServer() async {
     print(" 오디오 서버로 업로드+++++++++++++++++++++++++++++++++++++++++++++++++");
     // 서버 URL 수정
-    final String url = 'http://35.185.211.157:8000/stt/';
+    final String url = dotenv.env['appSttKey'] ?? "https://example.com"; // .env에서 API_URL 읽기
     final File file = File(_audioPath); // _audioPath는 녹음 파일의 경로
     if (!file.existsSync()) {
       print("파일이 존재하지 않습니다.");

@@ -46,6 +46,8 @@ dependencies:
   dio: ^5.4.0
   flutter_svg: ^2.0.9
   flutter_tts: ^3.8.5
+  flutter_config: ^2.0.2
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +83,8 @@ flutter:
     - assets/
     - assets/icons/
     - assets/fonts/
+    - .env
+
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -5,8 +5,10 @@ import 'cammer/camera_state.dart';
 import 'package:provider/provider.dart';
 import 'record/audio_record_state.dart';
 import 'chat/chat_state.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load(fileName: ".env"); // .env 파일 로드
   runApp(
     MultiProvider( // 여러 객체 상태 관리
       providers: [

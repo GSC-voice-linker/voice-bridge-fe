@@ -5,9 +5,11 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 //카메라 상태 관리
 //카메라 로직 구현
 class CameraRecordState extends ChangeNotifier {
+  final String url = dotenv.env['appSignTranslationKey'] ?? "https://example.com"; // .env에서 API_URL 읽기
   CameraController? _cameraController; // 카메라 제어를 위한 변수
   bool _isVideoRecording = false; // 녹화 중인지 여부를 저장하는 변수
   String _videoPath = ""; // 녹화된 파일의 경로를 저장하는 변수
@@ -85,7 +87,7 @@ class CameraRecordState extends ChangeNotifier {
   Future<void> _uploadVideoToServer() async {
     // 파일을 서버로 업로드하는 함수
     print("비디오 업로드 함수 실행+++++++++++++++++++++++++++++++++++++++++++++++++");
-    final String url = 'http://35.185.211.157:8000/sign_translation/';
+    // final String url = &appSttKey;;
     final File file = File(_videoPath); // // _videoPath는 녹화 파일의 경로
     if (!file.existsSync()) { // 파일이 존재하지 않으면
       print("파일이 존재하지 않습니다.");
