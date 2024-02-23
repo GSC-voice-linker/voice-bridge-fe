@@ -26,6 +26,8 @@ Our project utilizes a `.env` file to manage server addresses and other sensitiv
 2. Create a new file named `.env`.
 3. Add your configuration details in the format shown below:
 
+For security reasons, we have not provided the direct URLs to our server in the configuration. However, the server is operational, so you should be able to use the application without any issues by installing the APK.
+
 ```plaintext
 appSttKey='Sever Url'
 appSignTranslationKey='Sever Url'
